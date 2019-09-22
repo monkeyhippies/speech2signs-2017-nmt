@@ -104,7 +104,10 @@ class Translator(object):
 
             # -- Decoding -- #
             dec_output, *_ = self.model.decoder(
-                dec_partial_seq, dec_partial_pos, src_seq, enc_output)
+                dec_partial_seq.type(torch.cuda.LongTensor),
+				dec_partial_pos.type(torch.cuda.LongTensor),
+				src_seq.type(torch.cuda.LongTensor),
+				enc_output.type(torch.cuda.FloatTensor))
             dec_output = dec_output[:, -1, :] # (batch * beam) * d_model
             dec_output = self.model.tgt_word_proj(dec_output)
             out = self.model.prob_projection(dec_output)
