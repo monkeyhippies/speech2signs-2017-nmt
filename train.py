@@ -68,7 +68,7 @@ def train_epoch(model, training_data, crit, optimizer):
         n_words = gold.data.ne(Constants.PAD).sum()
         n_total_words += n_words
         n_total_correct += n_correct
-        total_loss += loss.data[0]
+        total_loss += loss.data
 
     return total_loss/n_total_words, n_total_correct/n_total_words
 
@@ -97,7 +97,7 @@ def eval_epoch(model, validation_data, crit):
         n_words = gold.data.ne(Constants.PAD).sum()
         n_total_words += n_words
         n_total_correct += n_correct
-        total_loss += loss.data[0]
+        total_loss += loss.data
 
     return total_loss/n_total_words, n_total_correct/n_total_words
 
