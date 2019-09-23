@@ -187,7 +187,7 @@ def main():
     parser.add_argument('-embs_share_weight', action='store_true')
     parser.add_argument('-proj_share_weight', action='store_true')
 
-	parser.add_argument('-checkpoint', default=None)
+    parser.add_argument('-checkpoint', default=None)
     parser.add_argument('-log', default=None)
     parser.add_argument('-save_model', default=None)
     parser.add_argument('-save_mode', type=str, choices=['all', 'best'], default='best')
