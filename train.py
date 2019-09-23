@@ -187,6 +187,7 @@ def main():
     parser.add_argument('-embs_share_weight', action='store_true')
     parser.add_argument('-proj_share_weight', action='store_true')
 
+	parser.add_argument('-checkpoint', default=None)
     parser.add_argument('-log', default=None)
     parser.add_argument('-save_model', default=None)
     parser.add_argument('-save_mode', type=str, choices=['all', 'best'], default='best')
@@ -230,8 +231,8 @@ def main():
 
     print(opt)
 
-    if os.path.exists(opt.model):
-        checkpoint = torch.load(opt.model)
+    if os.path.exists(opt.checkpoint):
+        checkpoint = torch.load(opt.checkpoint)
         model_opt = checkpoint['settings']
 
         model = Transformer(
