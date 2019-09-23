@@ -101,7 +101,7 @@ def eval_epoch(model, validation_data, crit):
 
     return total_loss/n_total_words, n_total_correct/n_total_words
 
-def train(model, training_data, validation_data, crit, optimizer, opt):
+def train(model, training_data, validation_data, crit, optimizer, opt, start_epoch):
     ''' Start training '''
 
     log_train_file = None
@@ -119,7 +119,7 @@ def train(model, training_data, validation_data, crit, optimizer, opt):
             log_vf.write('epoch,loss,ppl,accuracy\n')
 
     valid_accus = []
-    for epoch_i in range(opt.epoch):
+    for epoch_i in range(start_epoch, opt.epoch):
         print('[ Epoch', epoch_i, ']')
 
         start = time.time()
@@ -229,23 +229,44 @@ def main():
 
     print(opt)
 
-    transformer = Transformer(
-        opt.src_vocab_size,
-        opt.tgt_vocab_size,
-        opt.max_token_seq_len,
-        proj_share_weight=opt.proj_share_weight,
-        embs_share_weight=opt.embs_share_weight,
-        d_k=opt.d_k,
-        d_v=opt.d_v,
-        d_model=opt.d_model,
-        d_word_vec=opt.d_word_vec,
-        d_inner_hid=opt.d_inner_hid,
-        n_layers=opt.n_layers,
-        n_head=opt.n_head,
-        dropout=opt.dropout)
+    if os.path.exists(opt.model):
+        checkpoint = torch.load(opt.model)
+        model_opt = checkpoint['settings']
 
-    #print(transformer)
+        model = Transformer(
+            model_opt.src_vocab_size,
+            model_opt.tgt_vocab_size,
+            model_opt.max_token_seq_len,
+            proj_share_weight=model_opt.proj_share_weight,
+            embs_share_weight=model_opt.embs_share_weight,
+            d_k=model_opt.d_k,
+            d_v=model_opt.d_v,
+            d_model=model_opt.d_model,
+            d_word_vec=model_opt.d_word_vec,
+            d_inner_hid=model_opt.d_inner_hid,
+            n_layers=model_opt.n_layers,
+            n_head=model_opt.n_head,
+            dropout=model_opt.dropout)
 
+        epoch = checkpoint["epoch"] + 1
+        model.load_state_dict(checkpoint['model'])
+        print('[Info] Trained model state loaded.')
+    else:
+        transformer = Transformer(
+            opt.src_vocab_size,
+            opt.tgt_vocab_size,
+            opt.max_token_seq_len,
+            proj_share_weight=opt.proj_share_weight,
+            embs_share_weight=opt.embs_share_weight,
+            d_k=opt.d_k,
+            d_v=opt.d_v,
+            d_model=opt.d_model,
+            d_word_vec=opt.d_word_vec,
+            d_inner_hid=opt.d_inner_hid,
+            n_layers=opt.n_layers,
+            n_head=opt.n_head,
+            dropout=opt.dropout)
+        epoch = 0
     optimizer = ScheduledOptim(
         optim.Adam(
             transformer.get_trainable_parameters(),
@@ -265,7 +286,7 @@ def main():
         transformer = transformer.cuda()
         crit = crit.cuda()
 
-    train(transformer, training_data, validation_data, crit, optimizer, opt)
+    train(transformer, training_data, validation_data, crit, optimizer, opt, epoch)
 
 if __name__ == '__main__':
     main()
