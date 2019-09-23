@@ -235,7 +235,7 @@ def main():
         checkpoint = torch.load(opt.checkpoint)
         model_opt = checkpoint['settings']
 
-        model = Transformer(
+        transformer = Transformer(
             model_opt.src_vocab_size,
             model_opt.tgt_vocab_size,
             model_opt.max_token_seq_len,
@@ -251,7 +251,7 @@ def main():
             dropout=model_opt.dropout)
 
         epoch = checkpoint["epoch"] + 1
-        model.load_state_dict(checkpoint['model'])
+        transformer.load_state_dict(checkpoint['model'])
         print('[Info] Trained model state loaded.')
     else:
         transformer = Transformer(
